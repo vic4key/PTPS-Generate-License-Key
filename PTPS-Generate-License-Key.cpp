@@ -77,8 +77,10 @@ tstring run_and_get_license_key(tstring file_path)
     require(address != -1, "find address failed");
 
     // set break-point at the found address
-    vu::byte bp[2] = { 0xEB, 0xFE }; // jmp rip
-    auto status = process.write_memory(address, bp, sizeof(bp), true);
+    vu::byte bp[2] = { 0xEB, 0xFE }, bk[2] = { 0 };
+    bool status = true;
+    status &= process.read_memory(address, bk, sizeof(bk));
+    status &= process.write_memory(address, bp, sizeof(bp), true);
     require(status, "set break-point failed");
     msg_box(ts("Do the following steps :\n\n1. Select features (optional).\n2. Press 'Apply' button.\n3. Close this message box."));
 
@@ -95,8 +97,12 @@ tstring run_and_get_license_key(tstring file_path)
     key[32] = ts('\x00');
     result.assign(key);
 
+    // remove break-point at the found address
+    status &= process.write_memory(address, bk, sizeof(bk), true);
+    require(status, "remove break-point failed");
+
     // termiate process after finished
-    TerminateProcess(pi.hProcess, 0);
+    // TerminateProcess(pi.hProcess, 0);
   }
   catch (string error)
   {
