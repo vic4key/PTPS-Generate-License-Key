@@ -23,39 +23,14 @@ using namespace std;
 
 #define require(cond, msg) if (!(cond)) throw string(msg);
 
-ulongptr scan_process_region_memories_to_find_address(Process& process, const tstring& pattern)
-{
-  const auto exe = process.get_module_information();
-
-  for (auto& e : process.get_memories(MEM_COMMIT, MEM_IMAGE, PAGE_EXECUTE_READ))
-  {
-    if (e.BaseAddress < exe.modBaseAddr || e.BaseAddress > exe.modBaseAddr + exe.modBaseSize)
-    {
-      continue;
-    }
-
-    Buffer block;
-    block.resize(e.RegionSize);
-    bool ret = process.read_memory(ulongptr(e.BaseAddress), block);
-    require(ret, "read region memory failed");
-
-    auto offsets = find_pattern(block, pattern, true);
-    if (!offsets.empty())
-    {
-      return ulongptr(e.BaseAddress) + offsets.front();
-    }
-  }
-
-  return -1;
-}
-
 tstring run_and_get_license_key(tstring file_path)
 {
   tstring result;
 
   try
   {
-    tstring file_dir = extract_file_directory(file_path);
+    tstring file_name = extract_file_name(file_path);
+    tstring file_cdir = extract_file_directory(file_path);
     PROCESS_INFORMATION pi = { 0 };
 
     // create the process
@@ -65,16 +40,18 @@ tstring run_and_get_license_key(tstring file_path)
     WaitForInputIdle(pi.hProcess, INFINITE); // wait for process fully loaded in virtual memory
 
     // find the address that available to get key
+    std::vector<size_t> addresses;
     tstring version = ts("58");
     tstring pattern = ts("74 43 48 8B 54 24 ?? 48 2B D1 48 8B C1 48 81 FA 00 10 00 00 72 1C");
-    auto address = scan_process_region_memories_to_find_address(process, pattern);
-    if (address == -1)
+    process.scan_memory(addresses, pattern, file_name, true, MEM_COMMIT, MEM_IMAGE, PAGE_EXECUTE_READ);
+    if (addresses.empty())
     {
       version = ts("57");
       pattern = ts("74 09 48 8B CB E8 ?? ?? ?? ?? 90 48 85 FF 74 08 48 8B CF");
-      address = scan_process_region_memories_to_find_address(process, pattern);
+      process.scan_memory(addresses, pattern, file_name, true, MEM_COMMIT, MEM_IMAGE, PAGE_EXECUTE_READ);
     }
-    require(address != -1, "find address failed");
+    require(!addresses.empty(), "find address failed");
+    auto address = addresses.front();
 
     // set break-point at the found address
     vu::byte bp[2] = { 0xEB, 0xFE }, bk[2] = { 0 };
