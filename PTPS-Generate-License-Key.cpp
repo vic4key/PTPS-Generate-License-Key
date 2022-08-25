@@ -6,14 +6,14 @@
 Panther TPS 5.7 or ealier (VS 2012)
 74 09 48 8B CB E8 ?? ?? ?? ?? 90 48 85 FF 74 08 48 8B CF
 RSI = 000000000014B500     <&const CStringP::`vftable'>
-000000000014B500  00007FFABAF13688  .6ñºú...  panthercommon.??_7CStringP@@6B@         // vtable
-000000000014B508  00000000063FF680  .ö?.....  L"3B0BC207F8151B231A166492EE99C941"     // m_data
+000000000014B500  00007FFABAF13688  .6Ã±ÂºÃº...  panthercommon.??_7CStringP@@6B@         // vtable
+000000000014B508  00000000063FF680  .Ã¶?.....  L"3B0BC207F8151B231A166492EE99C941"     // m_data
 
 Panther TPS 5.8 or later (VS 2019)
 74 43 48 8B 54 24 ?? 48 2B D1 48 8B C1 48 81 FA 00 10 00 00 72 1C
 R15 : 000000000014C9E8     <&const CStringP::`vftable'>
-000000000014C9E8  00007FFAB312D550  PÕ.³ú...  panthercommon.const CStringP::`vftable' // vtable
-000000000014C9F0  00000000104E58A0   XN.....  L"3B0BC207F8151B231A166492EE99C941"     // m_data
+000000000014C9E8  00007FFAB312D550  PÃ•.Â³Ãº...  panthercommon.const CStringP::`vftable' // vtable
+000000000014C9F0  00000000104E58A0  Â XN.....  L"3B0BC207F8151B231A166492EE99C941"     // m_data
 
 */
 
@@ -35,7 +35,7 @@ tstring run_and_get_license_key(const tstring& file_path)
 
     // create the process
     Process process;
-    process.create(file_path, extract_file_directory(file_path), ts(""), NORMAL_PRIORITY_CLASS, false, &pi);
+    process.create(file_path, file_cdir, ts(""), NORMAL_PRIORITY_CLASS, false, &pi);
     require(process.ready(), "create process failed");
     WaitForInputIdle(pi.hProcess, INFINITE); // wait for process fully loaded in virtual memory
 
