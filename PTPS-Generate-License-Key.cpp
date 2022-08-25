@@ -23,7 +23,7 @@ using namespace std;
 
 #define require(cond, msg) if (!(cond)) throw string(msg);
 
-tstring run_and_get_license_key(tstring file_path)
+tstring run_and_get_license_key(const tstring& file_path)
 {
   tstring result;
 
@@ -43,12 +43,12 @@ tstring run_and_get_license_key(tstring file_path)
     std::vector<size_t> addresses;
     tstring version = ts("58");
     tstring pattern = ts("74 43 48 8B 54 24 ?? 48 2B D1 48 8B C1 48 81 FA 00 10 00 00 72 1C");
-    process.scan_memory(addresses, pattern, file_name, true, MEM_COMMIT, MEM_IMAGE, PAGE_EXECUTE_READ);
+    process.scan_memory(addresses, pattern, file_name, true, MEM_COMMIT, MEM_IMAGE | MEM_MAPPED | MEM_PRIVATE, PAGE_EXECUTE_READWRITE);
     if (addresses.empty())
     {
       version = ts("57");
       pattern = ts("74 09 48 8B CB E8 ?? ?? ?? ?? 90 48 85 FF 74 08 48 8B CF");
-      process.scan_memory(addresses, pattern, file_name, true, MEM_COMMIT, MEM_IMAGE, PAGE_EXECUTE_READ);
+      process.scan_memory(addresses, pattern, file_name, true, MEM_COMMIT, MEM_IMAGE | MEM_MAPPED | MEM_PRIVATE, PAGE_EXECUTE_READWRITE);
     }
     require(!addresses.empty(), "find address failed");
     auto address = addresses.front();
@@ -101,6 +101,9 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
   if (!picker.choose_file(Picker::action_type::open, file_path, ts(""), file_filter)) return 0;
 
   auto key = run_and_get_license_key(file_path);
+
+  Sleep(1000); // waiting for the invalid message box shown
+
   InputDialog dlg(ts("Generated License Key"), nullptr, false, key);
   dlg.do_modal();
 
