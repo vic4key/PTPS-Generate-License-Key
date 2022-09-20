@@ -42,13 +42,13 @@ tstring run_and_get_license_key(const tstring& file_path)
     // find the address that available to get key
     std::vector<size_t> addresses;
     tstring version = ts("58");
-    tstring pattern = ts("74 43 48 8B 54 24 ?? 48 2B D1 48 8B C1 48 81 FA 00 10 00 00 72 1C");
-    process.scan_memory(addresses, pattern, file_name, true, MEM_COMMIT, MEM_IMAGE | MEM_MAPPED | MEM_PRIVATE, PAGE_EXECUTE_READWRITE);
+    tstring pattern = ts("48 8B 4C 24 28 48 85 C9 74 43 48 8B 54 24 ?? 48 2B D1 48 8B C1 48 81 FA 00 10 00 00 72 1C");
+    process.scan_memory(addresses, pattern, file_name, true, MEM_COMMIT, MEM_IMAGE | MEM_MAPPED | MEM_PRIVATE);
     if (addresses.empty())
     {
       version = ts("57");
       pattern = ts("74 09 48 8B CB E8 ?? ?? ?? ?? 90 48 85 FF 74 08 48 8B CF");
-      process.scan_memory(addresses, pattern, file_name, true, MEM_COMMIT, MEM_IMAGE | MEM_MAPPED | MEM_PRIVATE, PAGE_EXECUTE_READWRITE);
+      process.scan_memory(addresses, pattern, file_name, true, MEM_COMMIT, MEM_IMAGE | MEM_MAPPED | MEM_PRIVATE);
     }
     require(!addresses.empty(), "find address failed");
     auto address = addresses.front();
