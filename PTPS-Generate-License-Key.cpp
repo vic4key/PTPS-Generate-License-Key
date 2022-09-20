@@ -3,13 +3,13 @@
 
 /*
 
-Panther TPS 5.7 or ealier (VS 2012)
+PTPS 5.7 or ealier (VS 2012)
 74 09 48 8B CB E8 ?? ?? ?? ?? 90 48 85 FF 74 08 48 8B CF
 RSI = 000000000014B500     <&const CStringP::`vftable'>
 000000000014B500  00007FFABAF13688  .6ñºú...  panthercommon.??_7CStringP@@6B@         // vtable
 000000000014B508  00000000063FF680  .ö?.....  L"3B0BC207F8151B231A166492EE99C941"     // m_data
 
-Panther TPS 5.8 or later (VS 2019)
+PTPS 5.8 or later (VS 2019)
 74 43 48 8B 54 24 ?? 48 2B D1 48 8B C1 48 81 FA 00 10 00 00 72 1C
 R15 : 000000000014C9E8     <&const CStringP::`vftable'>
 000000000014C9E8  00007FFAB312D550  PÕ.³ú...  panthercommon.const CStringP::`vftable' // vtable
